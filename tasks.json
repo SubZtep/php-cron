@@ -1,0 +1,11 @@
+[
+	{
+		"exec": "task1.php",
+		"secs": 1,
+		"log": "one"
+	},
+	{
+		"exec": "task2.php",
+		"secs": 3
+	}
+]
