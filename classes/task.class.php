@@ -16,7 +16,7 @@ class Task
 	public function run() {
 		if ($this->log) {
 			$log = __DIR__."/../log/{$this->log}.txt";
-			file_put_contents($log, "\n-----\n".date('Y-m-d H:i:s')."\n-----\n\n", FILE_APPEND);
+			file_put_contents($log, "\n\n-----\n".date('Y-m-d H:i:s')."\n-----\n\n", FILE_APPEND);
 			$log = " >> $log 2>> $log";
 		} else {
 			$log = ' > /dev/null 2> /dev/null';
@@ -27,7 +27,7 @@ class Task
 	}
 
 	public function shouldRun() {
-		return true;
+		return time() >= $this->nextRun;
 	}
 
 	public function isRunning() {
