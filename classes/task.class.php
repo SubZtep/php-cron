@@ -13,16 +13,17 @@ class Task
 		$this->log = isset($data['log']) ? $data['log'] : null;
 	}
 
-	public function run() {
+	private function getLogArgv() {
 		if ($this->log) {
 			$log = __DIR__."/../log/{$this->log}.txt";
 			file_put_contents($log, "\n\n-----\n".date('Y-m-d H:i:s')."\n-----\n\n", FILE_APPEND);
-			$log = " >> $log 2>> $log";
-		} else {
-			$log = ' > /dev/null 2> /dev/null';
+			return " >> $log 2>> $log";
 		}
+		return ' > /dev/null 2> /dev/null';
+	}
 
-		$this->pid = exec($this->exec.$log.' & echo $!');
+	public function run() {
+		$this->pid = exec($this->exec.$this->getLogArgv().' & echo $!');
 		$this->nextRun = time() + $this->secs;
 	}
 
