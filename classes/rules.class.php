@@ -11,6 +11,7 @@ class Rules
 
 	public function processJson() {
 		$json = file_get_contents(__DIR__.'/../tasks.json');
+		$json = preg_replace('!/\*.*?\*/!s', '', $json); // remove comments
 		$this->tasksArr = json_decode($json, true);
 	}
 
@@ -19,7 +20,7 @@ class Rules
 		$this->tasks = [];
 		foreach ($this->tasksArr as $task_arr) {
 			$this->tasks[] = new Task($task_arr);
-		}		
+		}
 	}
 
 	public function getTasks() {
