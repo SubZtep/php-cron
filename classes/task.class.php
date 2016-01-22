@@ -16,7 +16,11 @@ class Task
 	private function getLogArgv() {
 		if ($this->log) {
 			$log = __DIR__."/../log/{$this->log}.txt";
-			file_put_contents($log, "\n\n-----\n".date('Y-m-d H:i:s')."\n-----\n\n", FILE_APPEND);
+			file_put_contents(
+				$log,
+				"\n\n-----\n".date('Y-m-d H:i:s')."\n-----\n\n",
+				FILE_APPEND
+			);
 			return " >> $log 2>> $log";
 		}
 		return ' > /dev/null 2> /dev/null';
