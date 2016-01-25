@@ -1,26 +1,34 @@
 <?php
 class Rules
 {
-	public $tasksArr = [];
-	public $tasks = [];
-	private $lastTaskIdx = 0;
+	private $tasks = [];
+	private $lastTaskIdx;
+	private $tasksFileName;
+	private $lastFileMod = 0;
 
-	public function __construct() {
+	public function __construct($tasksFileName) {
+		$this->tasksFileName = $tasksFileName;
 		$this->populateTasks();
 	}
 
-	public function processJson() {
-		$json = file_get_contents(__DIR__.'/../tasks.json');
+	private function getJsonData() {
+		$json = file_get_contents($this->tasksFileName);
+		$this->lastFileMod = filemtime($this->tasksFileName);
 		$json = preg_replace('!/\*.*?\*/!s', '', $json); // remove comments
-		$this->tasksArr = json_decode($json, true);
+		return json_decode($json, true);
+	}
+
+	public function resetTasks() {
+		$this->lastTaskIdx = 0;
 	}
 
 	public function populateTasks() {
-		$this->processJson();
 		$this->tasks = [];
-		foreach ($this->tasksArr as $task_arr) {
-			$this->tasks[] = new Task($task_arr);
+		$data = $this->getJsonData();
+		foreach ($data as $taskData) {
+			$this->tasks[] = new Task($taskData);
 		}
+		$this->resetTasks();
 	}
 
 	public function getTasks() {
@@ -30,9 +38,20 @@ class Rules
 		return $this->tasks;
 	}
 
+	public function isTasksUpdated() {
+		clearstatcache();
+		$lastMod = filemtime($this->tasksFileName);
+		if ($this->lastFileMod < $lastMod) {
+			$this->lastFileMod = $lastMod;
+			return true;
+		}
+		return false;
+	}
+
 	public function getNextTask() {
-		if (empty($this->tasks)) return false;
-		if (!isset($this->tasks[$this->lastTaskIdx])) $this->lastTaskIdx = 0;
+		if (empty($this->tasks) || !isset($this->tasks[$this->lastTaskIdx])) {
+			return false;
+		}
 		return $this->tasks[$this->lastTaskIdx++];
 	}
 }
