@@ -10,7 +10,7 @@ class Task
 	public $nextRun = 0; // Next run timestamp
 
 	public function __construct($data = []) {
-		$this->exec = $data['exec'];
+		$this->exec = isset($data['exec']) ? $data['exec'] : null;
 		$this->secs = isset($data['secs']) ? (int)$data['secs'] : 0;
 		$this->log = isset($data['log']) ? $data['log'] : null;
 	}
