@@ -1,4 +1,6 @@
 <?php
+namespace PhpCron;
+
 class Rules
 {
 	private $tasks = [];

@@ -1,4 +1,6 @@
 <?php
+namespace PhpCron;
+
 class TaskRunner
 {
 	private $rules;

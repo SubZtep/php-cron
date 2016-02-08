@@ -1,4 +1,6 @@
 <?php
+namespace PhpCron;
+
 class Task
 {
 	public $exec;        // string | execute line
