@@ -2,7 +2,7 @@
 
 This script is able to execute scripts, like crontab. But more often.
 
-**Please note that this script is under development and no tests yet.**
+**Please note that this script is under development.**
 
 ## Installation
 
