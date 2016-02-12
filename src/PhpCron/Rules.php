@@ -8,9 +8,11 @@ class Rules
 	private $tasksFileName;
 	private $lastFileMod = 0;
 
-	public function __construct($tasksFileName) {
-		$this->tasksFileName = $tasksFileName;
-		$this->populateTasks();
+	public function __construct($tasksFileName = null) {
+		if (!is_null($tasksFileName)) {
+			$this->tasksFileName = $tasksFileName;
+			$this->populateTasks();
+		}
 	}
 
 	private function getJsonData() {

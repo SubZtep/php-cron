@@ -11,4 +11,11 @@ class TaskTest extends \PHPUnit_Framework_TestCase
 		$task->nextRun += 3600;
 		$this->assertFalse($task->shouldRun());
 	}
+
+	public function testIsRunning() {
+		$task = new Task(['exec' => 'sleep 1']);
+		$this->assertFalse($task->isRunning());
+		$task->run();
+		$this->assertTrue($task->isRunning());
+	}
 }
