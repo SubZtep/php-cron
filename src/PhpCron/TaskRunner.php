@@ -16,7 +16,7 @@ class TaskRunner
 				$task->run();
 			}
 
-			echo 'Mem: '.number_format(memory_get_usage())."\n";
+			//echo 'Mem: '.number_format(memory_get_usage())."\n";
 			sleep(1);
 
 			if ($this->rules->isTasksUpdated()) {
