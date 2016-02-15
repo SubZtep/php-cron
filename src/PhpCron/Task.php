@@ -5,25 +5,43 @@ class Task
 {
 	public $exec;        // string | execute line
 	public $secs;        // int    | frequency in seconds
-	public $log;         // string | log identifier
+	public $log = null;  // string | log identifier
 	public $pid = null;  // PID
 	public $nextRun = 0; // Next run timestamp
 
 	public function __construct($data = []) {
 		$this->exec = isset($data['exec']) ? $data['exec'] : null;
 		$this->secs = isset($data['secs']) ? (int)$data['secs'] : 0;
-		$this->log = isset($data['log']) ? $data['log'] : null;
+		if (isset($data['log'])) {
+			$this->log = $data['log'];
+			if (!$this->hasLogAccess()) {
+				throw new \Exception('Access denied to '.$this->log);
+			}
+		}
+	}
+
+	private function hasLogAccess() {
+		if (is_null($this->log)) {
+			return true;
+		}
+		if (!file_exists($this->log)) {
+			if (@touch($this->log)) {
+				unlink($this->log);
+				return true;
+			}
+			return false;
+		}
+		return is_writable($this->log);
 	}
 
 	private function getLogArgv() {
 		if ($this->log) {
-			$log = __DIR__."/../log/{$this->log}.txt";
 			file_put_contents(
-				$log,
+				$this->log,
 				"\n\n-----\n".date('Y-m-d H:i:s')."\n-----\n\n",
 				FILE_APPEND
 			);
-			return " >> $log 2>> $log";
+			return ' >> '.$this->log.' 2>> '.$this->log;
 		}
 		return ' > /dev/null 2> /dev/null';
 	}
