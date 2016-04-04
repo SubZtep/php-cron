@@ -3,45 +3,55 @@ namespace PhpCron;
 
 class Task
 {
-	public $exec;        // string | execute line
-	public $secs;        // int    | frequency in seconds
-	public $log = null;  // string | log identifier
-	public $pid = null;  // PID
-	public $nextRun = 0; // Next run timestamp
+	public $exec;            // string | execute line
+	public $secs;            // int    | frequency in seconds
+	public $logFile = null;  // string | log file
+	public $report = [];     // Email address(es) to send output report
+	public $pid = null;      // PID
+	public $nextRun = 0;     // Next run timestamp
+
+	protected $tempFile;     // Store cron output temporary
+
 
 	public function __construct($data = []) {
 		$this->exec = isset($data['exec']) ? $data['exec'] : null;
 		$this->secs = isset($data['secs']) ? (int)$data['secs'] : 0;
+		$this->tempFile = tempnam(sys_get_temp_dir(), 'php-cron');
+
 		if (isset($data['log'])) {
-			$this->log = $data['log'];
+			$this->logFile = $data['log'];
 			if (!$this->hasLogAccess()) {
-				throw new \Exception('Access denied to '.$this->log);
+				throw new \Exception('Access denied to '.$this->logFile);
 			}
+		}
+
+		if (isset($data['report'])) {
+			$this->report = explode(',', $data['report']);
 		}
 	}
 
 	private function hasLogAccess() {
-		if (is_null($this->log)) {
+		if (is_null($this->logFile)) {
 			return true;
 		}
-		if (!file_exists($this->log)) {
-			if (@touch($this->log)) {
-				unlink($this->log);
+		if (!file_exists($this->logFile)) {
+			if (@touch($this->logFile)) {
+				unlink($this->logFile);
 				return true;
 			}
 			return false;
 		}
-		return is_writable($this->log);
+		return is_writable($this->logFile);
 	}
 
 	private function getLogArgv() {
-		if ($this->log) {
+		if ($this->logFile || $this->report) {
 			file_put_contents(
-				$this->log,
-				"\n\n-----\n".date('Y-m-d H:i:s')."\n-----\n\n",
+				$this->logFile,
+				'# - '.$this->pid.' - '.date('Y-m-d H:i:s')."\n",
 				FILE_APPEND
 			);
-			return ' >> '.$this->log.' 2>> '.$this->log;
+			return ' > '.$this->tempFile.' 2> '.$this->tempFile;
 		}
 		return ' > /dev/null 2> /dev/null';
 	}
@@ -63,5 +73,25 @@ class Task
 			$this->pid = null;
 		}
 		return false;
+	}
+
+	public function isTempAvailable() {
+		return file_exists($this->tempFile);
+	}
+
+	public function processTemp() {
+		if (filesize($this->tempFile) > 0) {
+			$content = file_get_contents($this->tempFile);
+
+			if ($this->logFile) {
+				file_put_contents($this->logFile, $content."\n", FILE_APPEND);
+			}
+
+			// Send emails
+			foreach ($this->report as $email) {
+				mail($email, '[Cron] '.$this->exec, $content);
+			}
+		}
+		unlink($this->tempFile);
 	}
 }

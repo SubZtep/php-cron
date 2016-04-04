@@ -12,6 +12,10 @@ class TaskRunner
 	public function runOnce() {
 		while ($task = $this->rules->getNextTask()) {
 
+			if (!$task->isRunning() && $task->isTempAvailable()) {
+				$task->processTemp();
+			}
+
 			if (!$task->isRunning() && $task->shouldRun()) {
 				$task->run();
 			}
