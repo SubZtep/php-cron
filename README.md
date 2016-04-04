@@ -17,7 +17,8 @@ Create `tasks.json` file to describe tasks. For example:
     {
         "exec": "php /var/www/cron-test/task1.php",
         "secs": 1,
-        "log": "/var/log/php-cron/one.log"
+        "log": "/var/log/php-cron/one.log",
+        "report": "john@doe.com,jane@doe.com"
     },
     {
         "exec": "php /var/www/cron-test/task2.php",
@@ -29,6 +30,7 @@ Create `tasks.json` file to describe tasks. For example:
 `exec`: Command to execute  
 `secs`: Number of seconds between runs  
 `log` (optional): Log file name with full path
+`report` (optional): Comma separated email address list to receive task output
 
 ## How to use
 
