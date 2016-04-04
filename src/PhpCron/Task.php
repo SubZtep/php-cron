@@ -48,7 +48,7 @@ class Task
 		if ($this->logFile || $this->report) {
 			file_put_contents(
 				$this->logFile,
-				'# - '.$this->pid.' - '.date('Y-m-d H:i:s')."\n",
+				'# - '.date('Y-m-d H:i:s')."\n",
 				FILE_APPEND
 			);
 			return ' > '.$this->tempFile.' 2> '.$this->tempFile;
